@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/film_archive?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/filmdb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: YOUR_MYSQL_PASSWORD
+    password: tongminh1510
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

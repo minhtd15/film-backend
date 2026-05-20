@@ -1,6 +1,8 @@
 package com.filmarchive.service;
 
+import com.filmarchive.model.FilmRoll;
 import com.filmarchive.model.Photo;
+import com.filmarchive.repository.FilmRollRepository;
 import com.filmarchive.repository.PhotoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +18,12 @@ public class PhotoService {
 
     private final PhotoRepository photoRepository;
     private final MinioService minioService;
+    private final FilmRollRepository filmRollRepository;
 
-    public PhotoService(PhotoRepository photoRepository, MinioService minioService) {
+    public PhotoService(PhotoRepository photoRepository, MinioService minioService, FilmRollRepository filmRollRepository) {
         this.photoRepository = photoRepository;
         this.minioService = minioService;
+        this.filmRollRepository = filmRollRepository;
     }
 
     public Page<Photo> findAll(Pageable pageable) {
@@ -31,7 +35,9 @@ public class PhotoService {
     }
 
     public Photo upload(Long filmRollId, MultipartFile file, String caption, String location) {
-        MinioService.UploadResult result = minioService.upload(file);
+        FilmRoll roll = filmRollRepository.findById(filmRollId)
+                .orElseThrow(() -> new RuntimeException("Film roll not found: " + filmRollId));
+        MinioService.UploadResult result = minioService.upload(file, roll.getName());
 
         int[] dimensions = readDimensions(file);
 

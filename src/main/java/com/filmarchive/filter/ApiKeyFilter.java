@@ -35,8 +35,12 @@ public class ApiKeyFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         String method = request.getMethod();
+        String path = request.getRequestURI();
 
-        if (WRITE_METHODS.contains(method)) {
+        String authHeader = request.getHeader("Authorization");
+        boolean hasBearerToken = authHeader != null && authHeader.startsWith("Bearer ");
+
+        if (WRITE_METHODS.contains(method) && !hasBearerToken && !path.startsWith("/api/auth/")) {
             String key = request.getHeader(API_KEY_HEADER);
             if (!apiKey.equals(key)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

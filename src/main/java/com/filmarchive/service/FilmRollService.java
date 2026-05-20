@@ -15,10 +15,12 @@ public class FilmRollService {
 
     private final FilmRollRepository filmRollRepository;
     private final PhotoRepository photoRepository;
+    private final MinioService minioService;
 
-    public FilmRollService(FilmRollRepository filmRollRepository, PhotoRepository photoRepository) {
+    public FilmRollService(FilmRollRepository filmRollRepository, PhotoRepository photoRepository, MinioService minioService) {
         this.filmRollRepository = filmRollRepository;
         this.photoRepository = photoRepository;
+        this.minioService = minioService;
     }
 
     public List<FilmRoll> findAll() {
@@ -33,7 +35,16 @@ public class FilmRollService {
     public FilmRoll create(FilmRollRequest request) {
         FilmRoll roll = new FilmRoll();
         applyRequest(roll, request);
-        return filmRollRepository.save(roll);
+        FilmRoll saved = filmRollRepository.save(roll);
+
+        try {
+            String slug = saved.getName().toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
+            minioService.createDefaultFolder(slug + "/");
+        } catch (Exception e) {
+            // folder creation is best-effort; photos will still create the folder on upload
+        }
+
+        return saved;
     }
 
     public FilmRoll update(Long id, FilmRollRequest request) {

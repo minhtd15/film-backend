@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -26,12 +27,13 @@ public class MinioService {
         this.minioClient = minioClient;
     }
 
-    public UploadResult upload(MultipartFile file) {
+    public UploadResult upload(MultipartFile file, String folder) {
         try {
             ensureBucketExists();
 
             String ext = getExtension(file.getOriginalFilename());
-            String key = UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext);
+            String slug = folder.toLowerCase().replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
+            String key = slug + "/" + UUID.randomUUID() + (ext.isEmpty() ? "" : "." + ext);
 
             minioClient.putObject(PutObjectArgs.builder()
                     .bucket(bucket)
@@ -90,4 +92,33 @@ public class MinioService {
     }
 
     public record UploadResult(String key, String url) {}
+
+    /**
+     * Create a "folder" in the given bucket by uploading an empty object with a trailing slash.
+     * Ensures the bucket exists (creates it if missing).
+     */
+    public void createFolder(String bucket, String folder) throws Exception {
+        // Ensure bucket exists
+        boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+        if (!exists) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        }
+
+        // Create empty object (folder marker). S3/MinIO treat keys ending with '/' as folders in many UIs.
+        byte[] empty = new byte[0];
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(empty)) {
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucket)
+                            .object(folder)
+                            .stream(bais, empty.length, -1)
+                            .contentType("application/x-directory")
+                            .build()
+            );
+        }
+    }
+
+    public void createDefaultFolder(String folder) throws Exception {
+        createFolder(bucket, folder);
+    }
 }

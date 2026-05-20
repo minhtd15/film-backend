@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/changes/002-create-film-rolls.yaml
   - include:
       file: db/changelog/changes/003-create-photos.yaml
+  - include:
+      file: db/changelog/changes/004-create-users.yaml
