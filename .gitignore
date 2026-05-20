@@ -1,0 +1,10 @@
+target/
+.mvn/
+*.class
+*.jar
+*.war
+*.log
+.DS_Store
+.idea/
+*.iml
+src/main/resources/application.yml

@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-film-rolls
+      author: minhtong
+      changes:
+        - createTable:
+            tableName: film_rolls
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: manufacturer
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: iso
+                  type: INT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: film_format
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color_type
+                  type: ENUM('color', 'black_and_white', 'slide')
+                  defaultValue: color
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_type
+                  type: ENUM('in', 'out')
+                  constraints:
+                    nullable: false
+              - column:
+                  name: camera_id
+                  type: BIGINT
+              - column:
+                  name: created_at
+                  type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
