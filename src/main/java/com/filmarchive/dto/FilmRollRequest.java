@@ -14,5 +14,5 @@ public record FilmRollRequest(
         @NotNull ColorType colorType,
         @NotNull LocalDate date,
         @NotNull DateType dateType,
-        Long cameraId
+        @NotNull Long cameraId
 ) {}

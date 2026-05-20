@@ -2,9 +2,12 @@ package com.filmarchive.service;
 
 import com.filmarchive.dto.FilmRollRequest;
 import com.filmarchive.model.FilmRoll;
+import com.filmarchive.repository.CameraRepository;
 import com.filmarchive.repository.FilmRollRepository;
 import com.filmarchive.repository.PhotoRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -16,11 +19,14 @@ public class FilmRollService {
     private final FilmRollRepository filmRollRepository;
     private final PhotoRepository photoRepository;
     private final MinioService minioService;
+    private final CameraRepository cameraRepository;
 
-    public FilmRollService(FilmRollRepository filmRollRepository, PhotoRepository photoRepository, MinioService minioService) {
+    public FilmRollService(FilmRollRepository filmRollRepository, PhotoRepository photoRepository,
+                           MinioService minioService, CameraRepository cameraRepository) {
         this.filmRollRepository = filmRollRepository;
         this.photoRepository = photoRepository;
         this.minioService = minioService;
+        this.cameraRepository = cameraRepository;
     }
 
     public List<FilmRoll> findAll() {
@@ -66,6 +72,10 @@ public class FilmRollService {
     }
 
     private void applyRequest(FilmRoll roll, FilmRollRequest req) {
+        if (!cameraRepository.existsById(req.cameraId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Camera not found: " + req.cameraId());
+        }
         roll.setName(req.name());
         roll.setManufacturer(req.manufacturer());
         roll.setIso(req.iso());
