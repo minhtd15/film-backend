@@ -21,7 +21,6 @@ minio:
   bucket: film-archive
 
 app:
-  api-key: YOUR_API_KEY
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001
 

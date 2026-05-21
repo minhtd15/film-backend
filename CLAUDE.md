@@ -23,7 +23,6 @@ controller/
   CameraController.java     — CRUD cameras
 filter/
   JwtAuthFilter.java        — validates Bearer token
-  ApiKeyFilter.java         — X-API-Key fallback for write ops
 model/
   User.java                 — id, email, password, role (implements UserDetails)
   FilmRoll.java             — id, name, manufacturer, iso, filmFormat, colorType, date, dateType, cameraId
@@ -68,7 +67,6 @@ users:      id, email (unique), password, role (default USER), created_at
 ## Auth
 - POST /api/auth/register + /api/auth/login → returns JWT token
 - Write ops: Authorization: Bearer <token>
-- Fallback: X-API-Key: tongminh1510 (for direct API calls without JWT)
 - GET /api/** — fully public, no auth
 
 ## API Endpoints
